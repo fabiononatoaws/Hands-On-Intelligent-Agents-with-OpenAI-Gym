@@ -166,6 +166,17 @@ class CarlaEnv(gym.Env):
         self.start_coord = None
         self.end_coord = None
         self.last_obs = None
+        self.viewer = None
+
+    def render(self, mode=None):
+        filename = f'images/id_{self._spec.id}_ep_{self.episode_id}_step_{self.num_steps}'
+        self.frame_image.save_to_disk(filename)
+        # from gym.envs.classic_control import rendering
+        # if self.viewer is None:
+        #     self.viewer = rq
+        #     endering.SimpleImageViewer()
+        # self.viewer.imshow(self.frame_image)
+        # return self.viewer.isopen
 
     def init_server(self):
         print("Initializing new Carla server...")
@@ -408,7 +419,7 @@ class CarlaEnv(gym.Env):
         for name, image in sensor_data.items():
             if name == camera_name:
                 observation = image
-
+        self.frame_image = observation
         cur = measurements.player_measurements
 
         if self.config["enable_planner"]:

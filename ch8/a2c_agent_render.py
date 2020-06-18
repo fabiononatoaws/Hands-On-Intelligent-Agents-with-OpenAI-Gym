@@ -258,10 +258,11 @@ class DeepActorCriticAgent(mp.Process):
             self.env = Atari.make_env(self.env_name, self.env_conf)
         else:
             #print("Given environment name is not an Atari Env. Creating a Gym env")
-            video_file_name = "A2C_" + self.env_name
+
             self.env = gym.make(self.env_name)
-            self.env = wrappers.Monitor(self.env, './videos/' + video_file_name + datetime.now().strftime("%y-%m-%d-%H-%M") + '/',
-                                        video_callable=lambda episode_id: True, force=True, write_upon_reset=True)
+        video_file_name = "A2C_" + self.env_name
+        self.env = wrappers.Monitor(self.env, './videos/' + video_file_name + datetime.now().strftime("%y-%m-%d-%H-%M") + '/',
+                                    video_callable=lambda episode_id: True, force=True, write_upon_reset=True)
 
         self.state_shape = self.env.observation_space.shape
         if isinstance(self.env.action_space.sample(), int):  # Discrete action space
@@ -335,7 +336,8 @@ class DeepActorCriticAgent(mp.Process):
                 obs = next_obs
                 self.global_step_num += 1
                 if args.render:
-                    self.env.render()
+                    if step_num % 30 == 0:
+                        self.env.render()
                 #print(self.actor_name + ":Episode#:", episode, "step#:", step_num, "\t rew=", reward, end="\r")
                 writer.add_scalar(self.actor_name + "/reward", reward, self.global_step_num)
             print("{}:Episode#:{} \t ep_reward:{} \t mean_ep_rew:{}\t best_ep_reward:{}".format(
